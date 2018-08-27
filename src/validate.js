@@ -481,6 +481,14 @@ function F_VALIDATE(disabledHL) {
 		this.$ABRestrictionsLen = 0;
 		/** @type {number} */
 		this.$BARestrictionsLen = 0;
+		/** @type {number} */
+		this.$fwdMaxSpeed = 0;
+        /** @type {boolean} */
+		this.$fwdMaxSpeedUnverified = false;
+        /** @type {number} */
+		this.$revMaxSpeed = 0;
+        /** @type {boolean} */
+		this.$revMaxSpeedUnverified = false;
 
 		var seg = WMo.segments.getObjectById(objID);
 		if (classCodeIs(seg, CC_UNDEFINED) || classCodeIs(seg, CC_NULL))
@@ -499,7 +507,7 @@ function F_VALIDATE(disabledHL) {
 		this.$isRoundabout = classCodeDefined(attrs.junctionID)
 			&& null !== attrs.junctionID;
 		this.$hasHNs = attrs.hasHNs;
-		this.$isEditable = seg.arePropertiesEditable();
+		this.$isEditable = !seg.hasClosures(); //seg.arePropertiesEditable();
 		this.$type = attrs.roadType;
 		this.$typeRank = this.getTypeRank(attrs.roadType);
 
@@ -534,6 +542,11 @@ function F_VALIDATE(disabledHL) {
 			attrs.fwdRestrictions.length : 0;
 		this.$BARestrictionsLen = attrs.revRestrictions ?
 			attrs.revRestrictions.length : 0;
+		//setting speed
+		this.$fwdMaxSpeed = attrs.fwdMaxSpeed;
+		this.$fwdMaxSpeedUnverified = attrs.fwdMaxSpeedUnverified;
+		this.$revMaxSpeed = attrs.revMaxSpeed;
+		this.$revMaxSpeedUnverified = attrs.revMaxSpeedUnverified;
 
 		// mark some properties as readonly
 		Object.defineProperties(this, {
@@ -1588,15 +1601,16 @@ function F_VALIDATE(disabledHL) {
 
 		// emulate WMECH_color
 		var segmentGeometry = document.getElementById(rawSegment.geometry.id);
-		if (!segmentGeometry) continue;
+		if (segmentGeometry){
 
-		var strokeColor = segmentGeometry.getAttribute("stroke").toUpperCase();
-		if (4 === strokeColor.length)
-			strokeColor = '#' + strokeColor.charAt(1) + strokeColor.charAt(1)
-				+ strokeColor.charAt(2) + strokeColor.charAt(2)
-				+ strokeColor.charAt(3) + strokeColor.charAt(3);
-		if (strokeColor in _RT.$WMECHcolors)
-			rawSegment[GL_WMECHCOLOR] = strokeColor;
+			var strokeColor = segmentGeometry.getAttribute("stroke").toUpperCase();
+			if (4 === strokeColor.length)
+				strokeColor = '#' + strokeColor.charAt(1) + strokeColor.charAt(1)
+					+ strokeColor.charAt(2) + strokeColor.charAt(2)
+					+ strokeColor.charAt(3) + strokeColor.charAt(3);
+			if (strokeColor in _RT.$WMECHcolors)
+				rawSegment[GL_WMECHCOLOR] = strokeColor;
+		}
 
 		// check if the segment was already seen
 		if (seen) {
@@ -1659,6 +1673,11 @@ function F_VALIDATE(disabledHL) {
 		var nodeBID = segment.$nodeBID;
 		var isPartial = nodeA.$isPartial || nodeB.$isPartial;
 
+		var forwardSpeed = segment.$fwdMaxSpeed;
+		var reverseSpeed = segment.$revMaxSpeed;
+		var forwardSpeedUnverified = segment.$fwdMaxSpeedUnverified;
+		var reverseSpeedUnverified = segment.$fwdMaxSpeedUnverified
+
 		var now = Date.now();
 
 		// check partial segment
@@ -1683,7 +1702,8 @@ function F_VALIDATE(disabledHL) {
 		segment.incCityCounter();
 
 		// check if any editable found
-		if (segment.$isEditable)
+		//if (segment.$isEditable)
+		if(!segment.$rawSegment.hasClosures())
 			_REP.$isEditableFound = true;
 
 		// check expiration date
@@ -2007,6 +2027,10 @@ function F_VALIDATE(disabledHL) {
 					&& otherSegment.$address.$city === city
 					&& otherSegment.$address.$state === state
 					&& otherSegment.$address.$country === country
+					&& otherSegment.$fwdMaxSpeed === forwardSpeed
+					&& otherSegment.$revMaxSpeed === reverseSpeed
+					&& otherSegment.$fwdMaxSpeedUnverified === forwardSpeedUnverified
+					&& otherSegment.$revMaxSpeedUnverified === reverseSpeedUnverified
 					&& otherSegment.$type === roadType
 					&& otherSegment.$isToll === isToll
 					// 2 & 2 || !2 && !2
@@ -2070,6 +2094,10 @@ function F_VALIDATE(disabledHL) {
 					&& otherSegment.$address.$city === city
 					&& otherSegment.$address.$state === state
 					&& otherSegment.$address.$country === country
+					&& otherSegment.$fwdMaxSpeed === forwardSpeed
+					&& otherSegment.$revMaxSpeed === reverseSpeed
+					&& otherSegment.$fwdMaxSpeedUnverified === forwardSpeedUnverified
+					&& otherSegment.$revMaxSpeedUnverified === reverseSpeedUnverified
 					&& otherSegment.$type === roadType
 					&& otherSegment.$isToll === isToll
 					// 2 & 2 || !2 && !2

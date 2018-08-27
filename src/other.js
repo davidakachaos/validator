@@ -228,6 +228,18 @@ function F_STOP()
 	async(F_LAYERSON);
 }
 
+/*
+Poor mans sleep
+*/
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+
 /**
  * Merge End Handler
  */
@@ -311,6 +323,7 @@ function F_ONMERGEEND()
 	}
 
 	// do the job!
+    sleep(500);
 	sync(F_VALIDATE, false);
 
 	///////////////////////////////////////////////////////////////////////
@@ -495,7 +508,7 @@ function F_INIT()
 	if(classCodeDefined(UW.require))
 	{
 		R = UW.require;
-			WME_BETA = /beta/.test(location.href);
+		WME_BETA = /beta/.test(location.href);
 	}
 
 	// Google Analytics
