@@ -195,6 +195,10 @@ var RR_DIRT = 8;
 var RT_SERVICE = 21;
 /** @const */
 var RR_SERVICE = 9;
+/** @const */
+var RT_FERRY = 15;
+/** @const */
+var RR_FERRY = 10;
 
 /** @const */
 var RT_STREET = 1;

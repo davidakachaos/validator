@@ -610,6 +610,8 @@ function F_VALIDATE(disabledHL) {
 			1: 10,
 			// RT_PRIMARY = 2;
 			2: 11,
+			// RT_FERRY = 15;
+			15: 11,
 
 			// RT_RAMP = 4;
 			4: 12,
@@ -2805,6 +2807,16 @@ function F_VALIDATE(disabledHL) {
 					&& address.isOkFor(154))
 					segment.report(154);
 			} // GROUP isDrivable && Primary
+
+			// GROUP isDrivable && Ferry
+			if (RT_FERRY === roadType) {
+				// GROUP isDrivable && Ferry
+				options = getCheckOptions(155, countryCode);
+				if (options[CO_NUMBER] > lock
+					&& isLimitOk(155)
+					&& address.isOkFor(155))
+					segment.report(155);
+			} // GROUP isDrivable && Ferry
 
 		} // GROUP isDrivable
 		else {
