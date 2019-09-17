@@ -3369,6 +3369,11 @@ function F_VALIDATE(disabledHL) {
 
 			// GROUP name.length
 			if (!venue.$name.length) {
+				if (venue.$categories[0] === "PARK"
+					&& cityLen > 0
+					&& !streetLen
+					&& isLimitOk(269))
+					venue.report(269);
 				if (venue.$categories[0] === "PARK" && !cityLen
 					&& isLimitOk(258))
 					venue.report(258);
